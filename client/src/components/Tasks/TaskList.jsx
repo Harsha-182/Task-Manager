@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
-  Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography, 
+  Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography,
   TablePagination, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle,
-  TextField, Select, MenuItem, LinearProgress, Grid, IconButton
+  TextField, Select, MenuItem, LinearProgress, Grid, IconButton, Checkbox
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { fetchTasks, updateTask, deleteTask } from '../actions/TasksAction';
+import { fetchTasks, updateTask, deleteTask, reorderTasks } from '../actions/TasksAction';
+import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 
 const TaskList = () => {
   const dispatch = useDispatch();
@@ -58,6 +59,22 @@ const TaskList = () => {
     dispatch(deleteTask(index));
   };
 
+  const handleMarkCompleted = (task, index) => {
+    const updatedTask = { ...task, status: 'Completed' };
+    dispatch(updateTask(updatedTask, index));
+  };
+
+  const onDragEnd = (result) => {
+    if (!result.destination) return;
+
+    const reorderedTasks = Array.from(tasks);
+    const [removed] = reorderedTasks.splice(result.source.index, 1);
+    reorderedTasks.splice(result.destination.index, 0, removed);
+    
+    // Dispatch the reorder action
+    dispatch(reorderTasks(reorderedTasks));
+  };
+
   const getStatusValueAndColor = (status) => {
     switch (status) {
       case 'Pending':
@@ -80,73 +97,90 @@ const TaskList = () => {
       </Typography>
       {tasks.length > 0 ? (
         <>
-          <TableContainer 
-            component={Paper} 
-            sx={{
-              maxHeight: 400,
-              marginTop: 4,
-              backgroundColor: '#f9f9f9',
-              border: '1px solid #e0e0e0'
-            }}
-          >
-            <Table stickyHeader sx={{ minWidth: 650 }} aria-label="task table">
-              <TableHead>
-                <TableRow sx={{ backgroundColor: '#1976d2' }}>
-                  <TableCell sx={{fontWeight: 'bold' }}>Company</TableCell>
-                  <TableCell sx={{fontWeight: 'bold' }}>Project</TableCell>
-                  <TableCell sx={{fontWeight: 'bold' }}>Task</TableCell>
-                  <TableCell sx={{fontWeight: 'bold' }}>Status</TableCell>
-                  <TableCell sx={{fontWeight: 'bold' }}>Task Created On</TableCell>
-                  <TableCell sx={{fontWeight: 'bold' }}>Actions</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {tasks
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((task, index) => {
-                    const { value, color } = getStatusValueAndColor(task.status);
-                    return (
-                      <TableRow 
-                        key={index}
-                        sx={{ '&:nth-of-type(odd)': { backgroundColor: '#f2f2f2' } }} // Alternating row color
-                      >
-                        <TableCell>{task.companyName}</TableCell>
-                        <TableCell>{task.projectName}</TableCell>
-                        <TableCell>{task.taskName}</TableCell>
-                        <TableCell>
-                          <Grid container direction="column" alignItems="center">
-                            <Typography variant="body2">{task.status}</Typography>
-                            <LinearProgress 
-                              variant="determinate" 
-                              value={value} 
-                              sx={{
-                                width: '100px',
-                                height: '10px',
-                                borderRadius: '5px',
-                                backgroundColor: '#e0e0e0',
-                                '& .MuiLinearProgress-bar': { backgroundColor: color },
-                              }} 
-                            />
-                          </Grid>
-                        </TableCell>
-                        <TableCell>{task.createdOn}</TableCell>
-                        <TableCell>
-                          <Button variant="contained" color="primary" onClick={() => handleOpenDialog(task, index)}>
-                            Update
-                          </Button>
-                          <IconButton 
-                            onClick={() => handleDeleteTask(index)} 
-                            color="error"
-                          >
-                            <DeleteIcon />
-                          </IconButton>
-                        </TableCell>
+          <DragDropContext onDragEnd={onDragEnd}>
+            <Droppable droppableId="tasks">
+              {(provided) => (
+                <TableContainer
+                  component={Paper}
+                  sx={{
+                    maxHeight: 400,
+                    marginTop: 4,
+                    backgroundColor: '#f9f9f9',
+                    border: '1px solid #e0e0e0',
+                  }}
+                  {...provided.droppableProps}
+                  ref={provided.innerRef}
+                >
+                  <Table stickyHeader sx={{ minWidth: 650 }} aria-label="task table">
+                    <TableHead>
+                      <TableRow sx={{ backgroundColor: '#1976d2' }}>
+                        <TableCell sx={{ fontWeight: 'bold' }}>Completed</TableCell>
+                        <TableCell sx={{ fontWeight: 'bold' }}>Company</TableCell>
+                        <TableCell sx={{ fontWeight: 'bold' }}>Project</TableCell>
+                        <TableCell sx={{ fontWeight: 'bold' }}>Task</TableCell>
+                        <TableCell sx={{ fontWeight: 'bold' }}>Status</TableCell>
+                        <TableCell sx={{ fontWeight: 'bold' }}>Task Created On</TableCell>
+                        <TableCell sx={{ fontWeight: 'bold' }}>Actions</TableCell>
                       </TableRow>
-                    );
-                  })}
-              </TableBody>
-            </Table>
-          </TableContainer>
+                    </TableHead>
+                    <TableBody>
+                      {tasks.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((task, index) => {
+                        const { value, color } = getStatusValueAndColor(task.status);
+                        return (
+                          <Draggable key={task.id} draggableId={String(task.id)} index={index}>
+                            {(provided) => (
+                              <TableRow
+                                ref={provided.innerRef}
+                                {...provided.draggableProps}
+                                {...provided.dragHandleProps}
+                                sx={{ '&:nth-of-type(odd)': { backgroundColor: '#f2f2f2' } }} // Alternating row color
+                              >
+                                <TableCell>
+                                  <Checkbox
+                                    checked={task.status === 'Completed'}
+                                    onChange={() => handleMarkCompleted(task, index)}
+                                  />
+                                </TableCell>
+                                <TableCell>{task.companyName}</TableCell>
+                                <TableCell>{task.projectName}</TableCell>
+                                <TableCell>{task.taskName}</TableCell>
+                                <TableCell>
+                                  <Grid container direction="column" alignItems="center">
+                                    <Typography variant="body2">{task.status}</Typography>
+                                    <LinearProgress
+                                      variant="determinate"
+                                      value={value}
+                                      sx={{
+                                        width: '100px',
+                                        height: '10px',
+                                        borderRadius: '5px',
+                                        backgroundColor: '#e0e0e0',
+                                        '& .MuiLinearProgress-bar': { backgroundColor: color },
+                                      }}
+                                    />
+                                  </Grid>
+                                </TableCell>
+                                <TableCell>{task.createdOn}</TableCell>
+                                <TableCell>
+                                  <Button variant="contained" color="primary" onClick={() => handleOpenDialog(task, index)}>
+                                    Update
+                                  </Button>
+                                  <IconButton onClick={() => handleDeleteTask(index)} color="error">
+                                    <DeleteIcon />
+                                  </IconButton>
+                                </TableCell>
+                              </TableRow>
+                            )}
+                          </Draggable>
+                        );
+                      })}
+                      {provided.placeholder}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              )}
+            </Droppable>
+          </DragDropContext>
 
           <TablePagination
             component="div"

@@ -11,6 +11,7 @@ const initialState = {
 const FETCH_TASKS = 'FETCH_TASKS';
 const UPDATE_TASK = 'UPDATE_TASK';
 const DELETE_TASK = 'DELETE_TASK';
+const REORDER_TASK = 'REORDER_TASK';
 
 const TaskReducer = (state = initialState, action) => {
   switch (action.type) {
@@ -24,6 +25,8 @@ const TaskReducer = (state = initialState, action) => {
         ),
       };
     case DELETE_TASK:
+        return { ...state, tasks: action.payload };
+    case REORDER_TASK:
         return { ...state, tasks: action.payload };
     default:
       return state;

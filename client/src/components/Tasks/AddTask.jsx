@@ -60,6 +60,7 @@ const AddTask = () => {
 
   const handleSubmit = () => {
     const taskData = {
+      id: '_' + Math.random().toString(36).substr(2, 9),
       taskName: state.taskName,
       projectName: state.projectName,
       companyName: state.companyName,

@@ -39,6 +39,13 @@ export const deleteTask = (index) => {
   }
 };
 
+export const reorderTasks = (tasks) => {
+  return (dispatch) => {
+    localStorage.setItem('tasks', JSON.stringify(tasks));
+    dispatch({ type: 'REORDER_TASK', payload: tasks });
+  };
+};
+
 
 
 
