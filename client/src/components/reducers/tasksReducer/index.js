@@ -1,5 +1,5 @@
 /**
- * @function AccountReducer [Set the updated state for task module]
+ * @function TaskReducer [Set the updated state for task module]
  * @param {object} state
  * @param {object} action
  */

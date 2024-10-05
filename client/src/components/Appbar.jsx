@@ -39,8 +39,13 @@ function Appbar() {
         <Toolbar />
         <Box sx={{ overflow: 'auto' }}>
           <List>
-            {['Home','Add Task', 'View Task', 'Assign Task', 'Logout'].map((text, index) => {
-              const route = text === 'Logout' ? '/' : `/dashboard/${text.replace(' ', '').toLowerCase()}`
+            {['Dashboard', 'Project', 'Add Task', 'View Task', 'Assign Task', 'Users'].map((text, index) => {
+              const route = 
+              text === 'Dashboard' ? 
+                  '/dashboard/' :
+                  text === 'Users'?
+                    '/dashboard/admin/adduser':
+                    `/dashboard/${text.replace(' ', '').toLowerCase()}`
               return(
                 <ListItem key={text} disablePadding>
                   <ListItemButton component={Link} to={route}>

@@ -32,16 +32,8 @@ const {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      phone: {
+      role: {
         type: DataTypes.STRING,
-        allowNull: false,
-      },
-      country: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
-      is_checked: {
-        type: DataTypes.BOOLEAN,
         allowNull: false,
       },
       updated_by_id: {

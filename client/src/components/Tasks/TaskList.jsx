@@ -71,7 +71,6 @@ const TaskList = () => {
     const [removed] = reorderedTasks.splice(result.source.index, 1);
     reorderedTasks.splice(result.destination.index, 0, removed);
     
-    // Dispatch the reorder action
     dispatch(reorderTasks(reorderedTasks));
   };
 

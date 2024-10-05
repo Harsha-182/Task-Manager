@@ -1,16 +1,17 @@
 import axios from 'axios'
 /**
- * @function login [Login action dispatch the login action]
+ * @function signup [Signup action]
  * @param {object} formData
  */
 
-export function login(formData = {}) {
+export function signup(formData = {}) {
+    console.log("formData", formData)
     return async (dispatch) => {
-        dispatch({ type: 'LOGIN_REQUEST' });
+        dispatch({ type: 'SIGNUP_REQUEST' });
         try{
             if(Object.keys(formData).length > 0) {
                 const request = {
-                    url: '/auth/login',
+                    url: '/auth/signup',
                     method: 'POST',
                     headers: { 'Access-Control-Allow-Origin': true },
                     data: formData
@@ -29,29 +30,24 @@ export function login(formData = {}) {
                     data: request.data
                 }).then(
                     (response) => {
-                        const { accessToken, userInfo} = response.data;
-                        const { role } = response.data.userInfo;
-    
-                        localStorage.setItem('authToken', accessToken);
-                        localStorage.setItem('userRole', role);
-                        localStorage.setItem('userInfo', JSON.stringify(userInfo));
-
-                        dispatch({ type: 'LOGIN_SUCCESS', payload: { accessToken, role} });
+                        console.log("response", response)
+                        dispatch({ type: 'SIGNUP_SUCCESS', payload: {} });
                     },
                     (error) => {
+                        console.log("error", error)
                         dispatch({
-                            type: 'LOGIN_FAILURE',
-                            payload: error.response?.data?.message || 'Login failed',
+                            type: 'SIGNUP_FAILURE',
+                            payload: error.response?.data?.message || 'Signup failed',
                           });     
                     }
                 )
             } else {
-                dispatch ({type: 'LOGIN_RESET', payload: {} });
+                dispatch ({type: 'SIGNUP_RESET', payload: {} });
             }
         } catch(error){
             dispatch({
-                type: 'LOGIN_FAILURE',
-                payload: error.response?.data?.message || 'Login failed',
+                type: 'SIGNUP_FAILURE',
+                payload: error.response?.data?.message || 'Signup failed',
               });          
         }
     };

@@ -17,24 +17,16 @@ module.exports = {
         allowNull: false,
         unique: true,
       },
+      role: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
       first_name: {
         type: Sequelize.STRING,
         allowNull: false,
       },
       last_name: {
         type: Sequelize.STRING,
-        allowNull: false,
-      },
-      phone: {
-        type: Sequelize.STRING,
-        allowNull: false,
-      },
-      country: {
-        type: Sequelize.STRING,
-        allowNull: false,
-      },
-      is_checked: {
-        type: Sequelize.BOOLEAN,
         allowNull: false,
       },
       created_at: {

@@ -62,6 +62,7 @@ router.post('/login',
           id: checkUser.id,
           name: checkUser.first_name +" "+ checkUser.last_name ,
           email: checkUser.email,
+          role: checkUser.dataValues.role
         },
       }));
     } catch (error) {
@@ -79,16 +80,14 @@ router.post('/signup',
   validateRequest,
   async (req, res, next) => {
   try {
-      const { email, password, first_name, last_name, phone, country, is_checked } = req.body;
+      const { email, password, first_name, last_name, role } = req.body;
       const userExists = await userController.checkIfUserExists({ email });
 
       if (userExists) return next(httpErrorGenerator(400, HTTP_ERROR_MESSAGES.EMAIL_IN_USE));
 
-      const user = await userController.createUserWithCredentials({ email, first_name, last_name, password, phone, country, is_checked });
+      const user = await userController.createUserWithCredentials({ email, first_name, last_name, password, role });
 
       const token = await user.getJwtToken();
-
-      // const role = await user.getRole();
 
       return res.status(200).json(
           successResponseGenerator({
@@ -96,9 +95,9 @@ router.post('/signup',
                   id: user.id,
                   name: user.name,
                   email: user.email,
+                  role: user.role
               },
               accessToken: token,
-              // role,
           }),
       );
   } catch (error) {

@@ -7,17 +7,15 @@ module.exports = {
     try {
       await queryInterface.bulkInsert('users', [{
         id: uuidv4(),
-        email: 'test1@celestialsys.com',
-        first_name: 'Test',
-        last_name: 'user1',
-        phone: '9747262827',
-        country: 'India',
-        is_checked: true,
+        email: 'testadmin@gmail.com',
+        first_name: 'test',
+        last_name: 'admin',
+        role: 'admin',
         created_at: new Date(),
         updated_at: new Date(),
       }]);
       const User = await queryInterface.sequelize
-        .query("SELECT * FROM users where email='test1@celestialsys.com' LIMIT 1");
+        .query("SELECT * FROM users where email='testadmin@gmail.com' LIMIT 1");
       await queryInterface.bulkInsert('credentials', [{
         id: uuidv4(),
         password: '$2b$10$m/NN2SJvdqfRSr8dfE7hRuSpbrorG0rLmwqJ.khAsyYHO1.5djAQm', //admin@123

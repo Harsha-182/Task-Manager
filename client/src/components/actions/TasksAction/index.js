@@ -33,7 +33,6 @@ export const deleteTask = (index) => {
       console.log("i===",i,"index",index)
       return i !== index
     });
-    console.log("updatedTasks", updatedTasks)
     localStorage.setItem('tasks', JSON.stringify(updatedTasks));
     dispatch({ type: 'DELETE_TASK', payload: updatedTasks });
   }

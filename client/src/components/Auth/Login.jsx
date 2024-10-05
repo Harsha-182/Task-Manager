@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { Box, Button, TextField, Typography, Alert, CircularProgress } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 import { login } from '../actions/AuthAction/login';
-
 
 const theme = createTheme({
   palette: {
@@ -27,10 +27,17 @@ const theme = createTheme({
 
 const Login = () => {
   const dispatch = useDispatch();
-  const { loading, error, isAuthenticated } = useSelector(state => state.Login);
-  
+  const navigate = useNavigate();
+
+  const { loading, error, isAuthenticated, status } = useSelector(state => state.Login);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+
+  useEffect (() => {
+    if(status && status === 'success'){
+      navigate('/dashboard/')
+    }
+  },[status])
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -44,8 +51,8 @@ const Login = () => {
           display: 'flex', 
           justifyContent: 'center', 
           alignItems: 'center', 
-          height: '100vh', // Full viewport height
-          backgroundColor: 'background.default' // Background color from theme
+          height: '100vh',
+          backgroundColor: 'background.default'
         }}
       >
         <Box sx={{ maxWidth: 400, width: '100%', padding: 3, backgroundColor: '#fff', borderRadius: 2, boxShadow: 3 }}>

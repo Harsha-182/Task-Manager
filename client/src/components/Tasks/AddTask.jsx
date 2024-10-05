@@ -19,7 +19,6 @@ const useStyles = makeStyles((theme) => ({
     height: 'auto',
     width: '800px',
     padding: '20px',
-    // margin: '20px',
   },
   formContainer: {
     width: '100%',

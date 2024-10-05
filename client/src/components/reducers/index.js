@@ -1,10 +1,14 @@
 import { combineReducers } from 'redux';
-import TaskReducer from './tasksReducer';
 import { LoginReducer } from './authReducer/login';
+import { SignUpReducer } from './authReducer/signup';
+import UserReducer from './userReducer';
+import TaskReducer from './tasksReducer';
 
 const Reducers = combineReducers({
     Task: TaskReducer,
-    Login: LoginReducer
+    Login: LoginReducer,
+    User: UserReducer,
+    Signup: SignUpReducer
   });
   
 export default Reducers;

@@ -16,26 +16,17 @@ const { v4: uuidv4 } = require('uuid');
 
 
 const createUserWithCredentials = async ({
-  email, first_name, last_name, roleId, password, phone, country, is_checked
+  email, first_name, last_name, roleId, password, role
 }) => {
+
+  role.toLowerCase()
   const userDetails = {
     email,
     first_name,
     last_name,
     password,
-    // role_id: roleId,
-    phone,
-    country, 
-    is_checked 
+    role
   };
-  // if (!roleId) {
-  //   const defaultRole = await Role.findOne({
-  //     where: {
-  //       name: 'user',
-  //     },
-  //   });
-  //   userDetails.role_id = defaultRole.id;
-  // }
   if (userDetails.password) {
     return User.create({
       ...userDetails,
@@ -60,11 +51,10 @@ const createUserWithCredentials = async ({
  * @returns {Promise} Promise object representing the user defined by the search query.
  */
 const checkIfUserExists = async (query) => User.findOne({
-
   where: {
     ...query,
   },
-  attributes: ['id', 'first_name', 'last_name', 'email'],
+  attributes: ['id', 'first_name', 'last_name', 'email', 'role'],
 
 });
 

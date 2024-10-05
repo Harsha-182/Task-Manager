@@ -13,6 +13,7 @@ export const LoginReducer = (state = initialState, action) => {
         ...state,
         loading: true,
         error: null,
+        status: 'request'
       };
     case 'LOGIN_SUCCESS':
       return {
@@ -22,6 +23,7 @@ export const LoginReducer = (state = initialState, action) => {
         token: action.payload.token,
         role: action.payload.role,
         error: null,
+        status: 'success'
       };
     case 'LOGIN_FAILURE':
       return {
@@ -29,6 +31,7 @@ export const LoginReducer = (state = initialState, action) => {
         loading: false,
         isAuthenticated: false,
         error: action.payload,
+        status: 'error'
       };
     default:
       return state;

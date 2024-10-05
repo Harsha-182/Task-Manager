@@ -2,7 +2,6 @@ const createError = require('http-errors');
 
 const express = require('express');
 
-const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const router = require('./routes');
 const { httpErrorHandler, passport } = require('./middlewares');
@@ -14,7 +13,6 @@ app.use(cors());
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
 
 app.use(passport.initialize());
 
