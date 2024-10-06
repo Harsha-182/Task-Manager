@@ -1,27 +1,48 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+
 import {
   Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography,
   TablePagination, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle,
-  TextField, Select, MenuItem, LinearProgress, Grid, IconButton, Checkbox
+  TextField, Select, MenuItem, LinearProgress, Grid, IconButton, Checkbox, FormControl
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { fetchTasks, updateTask, deleteTask, reorderTasks } from '../actions/TasksAction';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
+
+import { fetchTasks, updateTask, deleteTask, reorderTasks } from '../actions/TasksAction';
+import { fetchUser, fetchUserFromDB } from '../actions/UserAction';
 
 const TaskList = () => {
   const dispatch = useDispatch();
   const tasks = useSelector((state) => state.Task.tasks);
+  const userStatus = useSelector((state) => state.GetUsers);
 
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
   const [updatedTask, setUpdatedTask] = useState({});
+  const [userList, setUserList] = useState([]);
+  // const [users, setUsers] = useState([]);
+
+  // useEffect(() => {
+  //   // const storedUsers = localStorage.getItem('users');
+  //   // if (storedUsers) {
+  //   //   setUsers(JSON.parse(storedUsers));
+  //   // }
+  // }, [dispatch]);
 
   useEffect(() => {
     dispatch(fetchTasks());
+    dispatch(fetchUser());
+    dispatch(fetchUserFromDB());
   }, [dispatch]);
+
+  useEffect(() => {
+    if (userStatus && userStatus.status === 'success') {
+        setUserList(userStatus.data.users);
+    }
+  }, [userStatus]);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -89,6 +110,18 @@ const TaskList = () => {
     }
   };
 
+  const handleAssignTo = (e, index) => {
+    const {  value } = e.target;
+
+    const taskToUpdate = {
+      ...tasks[index],
+      assignTo: value,
+    };
+    // setSelectedTask(index);
+    setUpdatedTask(taskToUpdate);
+    dispatch(updateTask(taskToUpdate, index));
+  }
+
   return (
     <Box sx={{ padding: 2 }}>
       <Typography variant="h4" component="h2" gutterBottom>
@@ -112,14 +145,16 @@ const TaskList = () => {
                 >
                   <Table stickyHeader sx={{ minWidth: 650 }} aria-label="task table">
                     <TableHead>
-                      <TableRow sx={{ backgroundColor: '#1976d2' }}>
+                      <TableRow sx={{ backgroundColor: '#1976d2'}}>
                         <TableCell sx={{ fontWeight: 'bold' }}>Completed</TableCell>
                         <TableCell sx={{ fontWeight: 'bold' }}>Company</TableCell>
                         <TableCell sx={{ fontWeight: 'bold' }}>Project</TableCell>
                         <TableCell sx={{ fontWeight: 'bold' }}>Task</TableCell>
                         <TableCell sx={{ fontWeight: 'bold' }}>Status</TableCell>
                         <TableCell sx={{ fontWeight: 'bold' }}>Task Created On</TableCell>
+                        <TableCell sx={{ fontWeight: 'bold' }}>Assigned To</TableCell>
                         <TableCell sx={{ fontWeight: 'bold' }}>Actions</TableCell>
+                        <TableCell sx={{ fontWeight: 'bold' }}></TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
@@ -134,16 +169,16 @@ const TaskList = () => {
                                 {...provided.dragHandleProps}
                                 sx={{ '&:nth-of-type(odd)': { backgroundColor: '#f2f2f2' } }} // Alternating row color
                               >
-                                <TableCell>
+                                <TableCell sx={{ fontWeight: 'bold' }}>
                                   <Checkbox
                                     checked={task.status === 'Completed'}
                                     onChange={() => handleMarkCompleted(task, index)}
                                   />
                                 </TableCell>
-                                <TableCell>{task.companyName}</TableCell>
-                                <TableCell>{task.projectName}</TableCell>
-                                <TableCell>{task.taskName}</TableCell>
-                                <TableCell>
+                                <TableCell sx={{ fontWeight: 'bold' }}>{task.companyName}</TableCell>
+                                <TableCell sx={{ fontWeight: 'bold' }}>{task.projectName}</TableCell>
+                                <TableCell sx={{ fontWeight: 'bold' }}>{task.taskName}</TableCell>
+                                <TableCell sx={{ fontWeight: 'bold' }}>
                                   <Grid container direction="column" alignItems="center">
                                     <Typography variant="body2">{task.status}</Typography>
                                     <LinearProgress
@@ -159,11 +194,32 @@ const TaskList = () => {
                                     />
                                   </Grid>
                                 </TableCell>
-                                <TableCell>{task.createdOn}</TableCell>
+                                <TableCell sx={{ fontWeight: 'bold' }}>{task.createdOn}</TableCell>
+                                <TableCell sx={{ fontWeight: 'bold' }}>
+                                  <FormControl>
+                                    <Select
+                                      value={task.assignTo || 'Assign To'}
+                                      onChange={(e) => handleAssignTo(e, index)}
+                                      displayEmpty
+                                      style={{width:'120px', height: '50px'}}
+                                    >
+                                      <MenuItem value="">
+                                        <em>Assign to user</em>
+                                      </MenuItem>
+                                      {userList.map((user) => (
+                                        <MenuItem key={user.id} value={user.id}>
+                                          {user.first_name} {user.last_name}
+                                        </MenuItem>
+                                      ))}
+                                    </Select>
+                                  </FormControl>
+                                </TableCell>
                                 <TableCell>
                                   <Button variant="contained" color="primary" onClick={() => handleOpenDialog(task, index)}>
                                     Update
                                   </Button>
+                                </TableCell>
+                                <TableCell>
                                   <IconButton onClick={() => handleDeleteTask(index)} color="error">
                                     <DeleteIcon />
                                   </IconButton>

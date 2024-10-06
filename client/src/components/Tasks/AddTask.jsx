@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useReducer} from 'react';
+import React, { useState, useEffect, useReducer } from 'react';
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
@@ -9,7 +9,6 @@ import Typography from '@mui/material/Typography';
 import { makeStyles } from '@mui/styles';
 import TextField from '@mui/material/TextField';
 import { MenuItem, Select } from '@mui/material';
-
 
 const useStyles = makeStyles((theme) => ({
   rootCard: {
@@ -33,33 +32,51 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-  const initialState = {
-    taskName: '',
-    projectName: '',
-    companyName: '',
-    status: 'In Progress',
-  };
-  
-  const reducer = (state, action) => {
-    switch (action.type) {
-      case 'SET_FIELD':
-        return { ...state, [action.field]: action.value };
-      case 'RESET':
-        return initialState;
-      default:
-        return state;
-    }
-  };
+const initialState = {
+  taskName: '',
+  projectName: '',
+  projectId: '',
+  companyName: '',
+  status: 'In Progress',
+};
+
+const reducer = (state, action) => {
+  switch (action.type) {
+    case 'SET_FIELD':
+      return { ...state, [action.field]: action.value };
+    case 'SET_PROJECT':
+      return {
+        ...state,
+        projectName: action.payload.projectName,
+        projectId: action.payload.projectId,
+      };
+    case 'RESET':
+      return initialState;
+    default:
+      return state;
+  }
+};
 
 const AddTask = () => {
   const classes = useStyles();
 
   const [taskCreatedOn, setTaskCreatedOn] = useState('');
   const [state, dispatch] = useReducer(reducer, initialState);
+  const [projects, setProjects] = useState([]);
 
-  const handleSubmit = () => {
+  useEffect(() => {
+    const storedProjects = localStorage.getItem('projects');
+    if (storedProjects) {
+      setProjects(JSON.parse(storedProjects));
+    }
+  }, []);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
     const taskData = {
       id: '_' + Math.random().toString(36).substr(2, 9),
+      projectId: state.projectId,
+      assignTo: state.assignTo,
       taskName: state.taskName,
       projectName: state.projectName,
       companyName: state.companyName,
@@ -71,7 +88,7 @@ const AddTask = () => {
     existingTasks.push(taskData);
 
     localStorage.setItem('tasks', JSON.stringify(existingTasks));
-    
+
     dispatch({ type: 'RESET' });
   };
 
@@ -82,13 +99,13 @@ const AddTask = () => {
   }, []);
 
   return (
-    <Box style={{display: 'flex',alignItems: 'center', flexDirection: 'column'}}>
+    <Box style={{ display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
       <Typography variant="h4" align="center" gutterBottom>
         Add Task
       </Typography>
       <Card className={classes.rootCard}>
         <CardContent>
-          <form className={classes.formContainer}>
+          <form className={classes.formContainer} onSubmit={handleSubmit}>
             <Grid container spacing={2}>
               <Grid item xs={12}>
                 <TextField
@@ -100,10 +117,11 @@ const AddTask = () => {
                   required
                   value={state.companyName}
                   onChange={(e) => dispatch({ type: 'SET_FIELD', field: 'companyName', value: e.target.value })}
-                  />
+                />
               </Grid>
               <Grid item xs={12}>
                 <TextField
+                  select
                   className={classes.inputField}
                   id="project"
                   label="Project"
@@ -111,8 +129,27 @@ const AddTask = () => {
                   fullWidth
                   required
                   value={state.projectName}
-                  onChange={(e) => dispatch({ type: 'SET_FIELD', field: 'projectName', value: e.target.value })}
-                  />
+                  onChange={(e) => {
+                    const selectedProject = projects.find(
+                      (project) => project.projectName === e.target.value
+                    );
+                    if (selectedProject) {
+                      dispatch({
+                        type: 'SET_PROJECT',
+                        payload: {
+                          projectName: selectedProject.projectName,
+                          projectId: selectedProject.id,
+                        },
+                      });
+                    }
+                  }}
+                >
+                  {projects.map((project) => (
+                    <MenuItem key={project.id} value={project.projectName}>
+                      {project.projectName}
+                    </MenuItem>
+                  ))}
+                </TextField>
               </Grid>
               <Grid item xs={12}>
                 <TextField
@@ -128,25 +165,24 @@ const AddTask = () => {
               </Grid>
               <Grid item xs={12}>
                 <Select
-                    className={classes.inputField}
-                    id="status"
-                    value={state.status}
-                    onChange={(e) => dispatch({ type: 'SET_FIELD', field: 'status', value: e.target.value })}
-                    >
-                    <MenuItem value="Completed">Pending</MenuItem>
-                    <MenuItem value="In Progress">In Progress</MenuItem>
-                    <MenuItem value="Not Started">Not Started</MenuItem>
-                    <MenuItem value="Completed">Completed</MenuItem>
+                  className={classes.inputField}
+                  id="status"
+                  value={state.status}
+                  onChange={(e) => dispatch({ type: 'SET_FIELD', field: 'status', value: e.target.value })}
+                >
+                  <MenuItem value="Pending">Pending</MenuItem>
+                  <MenuItem value="In Progress">In Progress</MenuItem>
+                  <MenuItem value="Not Started">Not Started</MenuItem>
+                  <MenuItem value="Completed">Completed</MenuItem>
                 </Select>
               </Grid>
               <Grid item xs={12}>
                 <TextField
-                  style={{marginBottom: '20px'}}
+                  style={{ marginBottom: '20px' }}
                   className={classes.inputField}
                   id="taskCreatedOn"
                   label="Task Created On"
                   variant="outlined"
-                //   type="date"
                   value={taskCreatedOn}
                   InputLabelProps={{ shrink: true }}
                   fullWidth
@@ -160,7 +196,6 @@ const AddTask = () => {
               variant="contained"
               color="primary"
               type="submit"
-              onClick={handleSubmit}
             >
               Submit
             </Button>

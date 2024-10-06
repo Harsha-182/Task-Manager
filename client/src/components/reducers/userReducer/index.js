@@ -8,7 +8,7 @@ const initialState = {
     tasks: []
   };
   
-const UserReducer = (state = initialState, action) => {
+export const UserReducer = (state = initialState, action) => {
     switch (action.type) {
         case 'FETCH_USERS':
             return { ...state, userList: action.payload };
@@ -16,5 +16,14 @@ const UserReducer = (state = initialState, action) => {
             return state;
     }
 };
-  
-export default UserReducer;
+
+export const UserDBReducer = (state = {}, action) => {
+    switch (action.type) {
+        case 'FETCHDBUSER_SUCCESS':
+            return { status: 'success', data: action.payload };
+        case 'FETCHDBUSER_FAILURE':
+            return { status: 'error', data: action.payload };
+        default:
+            return {...state};
+    }
+};

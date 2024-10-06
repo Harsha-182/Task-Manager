@@ -7,6 +7,7 @@ import TaskList from './Tasks/TaskList';
 import UnauthorizedModal from './UnAuthorizedModal';
 import AdminGrid from './AdminGrid';
 import AddUser from './Users/AddUser';
+import AddProject from './Projects/AddProject';
 
 function Dashboard(props) {
     const navigate = useNavigate();
@@ -17,7 +18,7 @@ function Dashboard(props) {
 
 
     const adminAccess = ['/dashboard/', '/dashboard/addtask', '/dashboard/viewtask',
-        '/dashboard/admin/adduser'
+        '/dashboard/admin/adduser', '/dashboard/admin/addproject'
     ];
     const userAccess = [];
 
@@ -54,11 +55,19 @@ function Dashboard(props) {
     return (
         <div>
             <Routes>
-                <Route element={showUnauthorizedModal? false: <Appbar/>}>
+                <Route element={showUnauthorizedModal? false: 
+                    <Appbar Items = {['Dashboard', 'Project', 'Add Task', 'View Task', 'Users']}/>}>
                     <Route path="/" Component={AdminGrid} />
                     <Route path="/addtask" Component={AddTask}/>
                     <Route path="/viewtask" Component={TaskList}/>
                     <Route path="/admin/adduser" Component={AddUser}/>
+                    <Route path="/admin/addproject" Component={AddProject}/>
+                </Route>
+                <Route element={showUnauthorizedModal? false: 
+                    <Appbar Items = {['Dashboard', 'Add Task', 'View Task']}/>}>
+                    {/* <Route path="/" Component={AdminGrid} /> */}
+                    {/* <Route path="/user/addtask" Component={AddTask}/> */}
+                    <Route path="/user/viewtask" Component={TaskList}/>
                 </Route>
             </Routes>
             <UnauthorizedModal showModal={showUnauthorizedModal} onClose={closeModal} message={message} />

@@ -17,7 +17,8 @@ import MailIcon from '@mui/icons-material/Mail';
 
 const drawerWidth = 240;
 
-function Appbar() {
+function Appbar(props) {
+  const { Items } = props;
   return (
     <Box sx={{ display: 'flex'}}>
       <CssBaseline />
@@ -39,13 +40,16 @@ function Appbar() {
         <Toolbar />
         <Box sx={{ overflow: 'auto' }}>
           <List>
-            {['Dashboard', 'Project', 'Add Task', 'View Task', 'Assign Task', 'Users'].map((text, index) => {
+            {Items.map((text, index) => {
               const route = 
               text === 'Dashboard' ? 
                   '/dashboard/' :
                   text === 'Users'?
                     '/dashboard/admin/adduser':
-                    `/dashboard/${text.replace(' ', '').toLowerCase()}`
+                    text === 'Project'?
+                      '/dashboard/admin/addproject':
+                      `/dashboard/${text.replace(' ', '').toLowerCase()}`
+              
               return(
                 <ListItem key={text} disablePadding>
                   <ListItemButton component={Link} to={route}>

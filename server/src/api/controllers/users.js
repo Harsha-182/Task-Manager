@@ -136,6 +136,9 @@ const updatePassword = async (userId, password) => {
   })
 }
 
+  const getUsers = async () => User.findAll({
+    where: {role: 'user'}
+  });
 
  module.exports = {
   createUserWithCredentials,
@@ -145,4 +148,5 @@ const updatePassword = async (userId, password) => {
   addSessionHistory,
   updatePassword,
   inactiveSession,
+  getUsers,
 };

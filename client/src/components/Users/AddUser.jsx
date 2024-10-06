@@ -43,7 +43,7 @@ const AddUserForm = () => {
     }, [error]);
 
     useEffect(() => {
-        if (success) {
+        if (success === true) {
             setShowSuccessAlert(true);
             setTimeout(() => setShowSuccessAlert(false), 5000);
         }
@@ -62,8 +62,6 @@ const AddUserForm = () => {
             alert("Passwords do not match");
             return;
         }
-        // Process the form data, e.g., send it to the backend API
-        console.log('User data:', formData);
         dispatch(signup(formData));
     };
 

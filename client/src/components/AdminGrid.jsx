@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { fetchUser } from './actions/UserAction';
+import { fetchTasks } from './actions/TasksAction';
 
 import { Box, Typography, Table, TableBody, TableCell, TableContainer,
      TableHead, TableRow, Paper, LinearProgress, Grid, Card, CardContent } from '@mui/material';
@@ -9,15 +10,21 @@ import { Box, Typography, Table, TableBody, TableCell, TableContainer,
 const AdminDashboard = () => {
     const dispatch = useDispatch();
     const user = useSelector((state) => state.User);
+    const tasks = useSelector((state) => state.Task.tasks);
+    const [projects, setProjects] = useState([]);
 
     useEffect(() => {
         dispatch(fetchUser());
+        dispatch(fetchTasks());
     }, [dispatch]);
 
-    const [projects] = useState([
-        { id: 1, name: 'Sample Project', progress: 50, status: 'On-Progress', dueDate: '2021-01-20' },
-        { id: 2, name: 'Sample Project 102', progress: 0, status: 'Started', dueDate: '2020-12-31' }
-    ]);
+    useEffect(() => {
+        const storedProjects = localStorage.getItem('projects');
+        if (storedProjects) {
+            setProjects(JSON.parse(storedProjects));
+        }
+    }, []);
+
 
   return (
     <Box sx={{ padding: 4 }}>
@@ -37,10 +44,11 @@ const AdminDashboard = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {projects.map((project) => (
+            {Array.isArray(projects) && projects.length > 0 ?(
+            projects.map((project) => (
               <TableRow key={project.id}>
                 <TableCell>{project.id}</TableCell>
-                <TableCell>{project.name}</TableCell>
+                <TableCell>{project.projectName}</TableCell>
                 <TableCell>
                   <LinearProgress variant="determinate" value={project.progress} />
                   <Typography variant="body2" sx={{ marginTop: 1 }}>{`${project.progress}% Complete`}</Typography>
@@ -58,9 +66,11 @@ const AdminDashboard = () => {
                     {project.status}
                   </Typography>
                 </TableCell>
-                <TableCell>{project.dueDate}</TableCell>
+                <TableCell>{project.endDate}</TableCell>
               </TableRow>
-            ))}
+            ))
+            ):(<Typography>No projects available</Typography>)
+            }
           </TableBody>
         </Table>
       </TableContainer>
@@ -81,7 +91,7 @@ const AdminDashboard = () => {
             <CardContent>
               <Typography variant="h5">Total Tasks</Typography>
               <Typography variant="h4" color="primary">
-                4
+                {Array.from(tasks).length}
               </Typography>
             </CardContent>
           </Card>
