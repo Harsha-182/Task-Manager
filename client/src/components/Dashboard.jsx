@@ -20,9 +20,11 @@ function Dashboard(props) {
     const adminAccess = ['/dashboard/', '/dashboard/addtask', '/dashboard/viewtask',
         '/dashboard/admin/adduser', '/dashboard/admin/addproject'
     ];
-    const userAccess = [];
+    const userAccess = ['/dashboard/user/'];
 
     const preferredLocation = (role) => {
+        console.log("role1", role)
+        console.log("requestedUrl", requestedUrl)
         if(role === 'admin' && adminAccess.includes(requestedUrl)) {
             navigate(requestedUrl);
         } else if(role === 'user' && userAccess.includes(requestedUrl)) {
@@ -55,20 +57,24 @@ function Dashboard(props) {
     return (
         <div>
             <Routes>
-                <Route element={showUnauthorizedModal? false: 
-                    <Appbar Items = {['Dashboard', 'Project', 'Add Task', 'View Task', 'Users']}/>}>
-                    <Route path="/" Component={AdminGrid} />
-                    <Route path="/addtask" Component={AddTask}/>
-                    <Route path="/viewtask" Component={TaskList}/>
-                    <Route path="/admin/adduser" Component={AddUser}/>
-                    <Route path="/admin/addproject" Component={AddProject}/>
-                </Route>
-                <Route element={showUnauthorizedModal? false: 
-                    <Appbar Items = {['Dashboard', 'Add Task', 'View Task']}/>}>
-                    {/* <Route path="/" Component={AdminGrid} /> */}
-                    {/* <Route path="/user/addtask" Component={AddTask}/> */}
-                    <Route path="/user/viewtask" Component={TaskList}/>
-                </Route>
+                {userRole === 'admin'? 
+                    <Route element={showUnauthorizedModal? false: 
+                        <Appbar 
+                            items = {['Dashboard', 'Project', 'Add Task', 'View Task', 'Users']}
+                            role={userRole}/>}
+                        >
+                        <Route path="/" Component={AdminGrid} />
+                        <Route path="/addtask" Component={AddTask}/>
+                        <Route path="/viewtask" Component={TaskList}/>
+                        <Route path="/admin/adduser" Component={AddUser}/>
+                        <Route path="/admin/addproject" Component={AddProject}/>
+                    </Route>
+                 :  
+                    <Route element={showUnauthorizedModal? false: 
+                        <Appbar items = {['Dashboard', 'Add Task', 'View Task']} role={userRole}/>}>
+                        <Route path="/user/" Component={TaskList} />
+                    </Route>
+                }
             </Routes>
             <UnauthorizedModal showModal={showUnauthorizedModal} onClose={closeModal} message={message} />
         </div>

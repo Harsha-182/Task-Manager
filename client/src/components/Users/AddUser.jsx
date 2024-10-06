@@ -49,7 +49,7 @@ const AddUserForm = () => {
         }
     }, [success]);
 
-    const roles = ['Admin', 'User', 'Manager'];  // You can modify these roles as per your requirement
+    const roles = ['admin', 'user'];  // You can modify these roles as per your requirement
 
     const handleChange = (e) => {
         const { name, value } = e.target;

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Outlet, Link } from 'react-router-dom';
+import { Outlet, Link, useNavigate } from 'react-router-dom';
 
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
@@ -14,11 +14,42 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import InboxIcon from '@mui/icons-material/MoveToInbox';
 import MailIcon from '@mui/icons-material/Mail';
+import { Button } from '@mui/material';
 
 const drawerWidth = 240;
 
 function Appbar(props) {
-  const { Items } = props;
+  const { items, role } = props;
+  const navigate = useNavigate();
+
+  const routeChoice = (text, role) => {
+    return (
+      role === 'admin' ?
+      text === 'Dashboard' ? 
+        '/dashboard/' :
+        text === 'Users'?
+          '/dashboard/admin/adduser':
+          text === 'Project'?
+            '/dashboard/admin/addproject':
+            `/dashboard/${text.replace(' ', '').toLowerCase()}`
+    :
+      text === 'Dashboard' ?
+        '/dashboard/user/' : 
+        text === 'Add Task'?
+          '/dashboard/user/adduser':
+          text === 'View Task'?
+            '/dashboard/user/viewtask':
+            `/dashboard/${text.replace(' ', '').toLowerCase()}`
+    )
+  }
+
+  const handleLogout = () => {
+    localStorage.removeItem('userInfo');
+    localStorage.removeItem('userRole');
+    localStorage.removeItem('authToken');
+    navigate('/login');
+  };
+  
   return (
     <Box sx={{ display: 'flex'}}>
       <CssBaseline />
@@ -27,6 +58,10 @@ function Appbar(props) {
           <Typography variant="h6" noWrap component="div">
             Task Manager
           </Typography>
+          <Box sx={{ flexGrow: 1 }} />
+          <Button color="inherit" onClick={handleLogout}>
+            Logout
+          </Button>
         </Toolbar>
       </AppBar>
       <Drawer
@@ -40,16 +75,8 @@ function Appbar(props) {
         <Toolbar />
         <Box sx={{ overflow: 'auto' }}>
           <List>
-            {Items.map((text, index) => {
-              const route = 
-              text === 'Dashboard' ? 
-                  '/dashboard/' :
-                  text === 'Users'?
-                    '/dashboard/admin/adduser':
-                    text === 'Project'?
-                      '/dashboard/admin/addproject':
-                      `/dashboard/${text.replace(' ', '').toLowerCase()}`
-              
+            {items.map((text, index) => {
+              const route = routeChoice(text, role)
               return(
                 <ListItem key={text} disablePadding>
                   <ListItemButton component={Link} to={route}>

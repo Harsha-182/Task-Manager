@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 import { Box, Button, TextField, Typography, Alert, CircularProgress } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
@@ -29,23 +31,40 @@ const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { loading, error, isAuthenticated, status } = useSelector(state => state.Login);
+  const { loading, error, status, role } = useSelector(state => state.Login);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [isToast, setToast] = useState(false);
 
   useEffect (() => {
-    if(status && status === 'success'){
-      navigate('/dashboard/')
+    if(isToast){
+      console.log("status", status)
+      if(status && status === 'success'){
+        console.log("role", role)
+        if(role === 'admin'){
+          navigate('/dashboard/');
+        } 
+        else if(role === 'user'){
+          navigate('/dashboard/user/');
+        } else {
+          toast.success('Your role not exist')
+        }
+        // toast.success('Login Successfull!')
+      } else{
+        toast.error(error)
+      }
     }
   },[status])
 
   const handleSubmit = (e) => {
     e.preventDefault();
     dispatch(login({ email, password }));
+    setToast(true);
   };
 
   return (
     <ThemeProvider theme={theme}>
+      <ToastContainer/>
       <Box 
         sx={{ 
           display: 'flex', 
@@ -59,7 +78,7 @@ const Login = () => {
           <Typography variant="h4" component="h1" gutterBottom textAlign="center" color="primary.main">
             Login
           </Typography>
-          <form onSubmit={handleSubmit}>
+          <form>
             <TextField
               label="Email"
               value={email}
@@ -82,13 +101,11 @@ const Login = () => {
                 <CircularProgress />
               </Box>
             ) : (
-              <Button variant="contained" color="primary" type="submit" fullWidth sx={{ marginTop: 2 }}>
+              <Button variant="contained" color="primary" onClick={handleSubmit} fullWidth sx={{ marginTop: 2 }}>
                 Login
               </Button>
             )}
           </form>
-          {error && <Alert severity="error" sx={{ marginTop: 2 }}>{error}</Alert>}
-          {isAuthenticated && <Alert severity="success" sx={{ marginTop: 2 }}>Login Successful!</Alert>}
         </Box>
       </Box>
     </ThemeProvider>

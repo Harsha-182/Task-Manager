@@ -14,7 +14,8 @@ import { fetchUser, fetchUserFromDB } from '../actions/UserAction';
 
 const TaskList = () => {
   const dispatch = useDispatch();
-  const tasks = useSelector((state) => state.Task.tasks);
+  const allTasks = useSelector((state) => state.Task.tasks);
+  const user = useSelector((state) => state.User);
   const userStatus = useSelector((state) => state.GetUsers);
 
   const [page, setPage] = useState(0);
@@ -23,14 +24,16 @@ const TaskList = () => {
   const [selectedTask, setSelectedTask] = useState(null);
   const [updatedTask, setUpdatedTask] = useState({});
   const [userList, setUserList] = useState([]);
-  // const [users, setUsers] = useState([]);
+  const [tasks, setTasks] = useState([]);
 
-  // useEffect(() => {
-  //   // const storedUsers = localStorage.getItem('users');
-  //   // if (storedUsers) {
-  //   //   setUsers(JSON.parse(storedUsers));
-  //   // }
-  // }, [dispatch]);
+  useEffect(() => {
+      if(user.userList){
+        let data = user?.userList?.role === 'admin'? 
+          allTasks :
+          allTasks.filter(task => task.assignTo && task.assignTo === user.userList.id);
+        setTasks(data)
+      }
+  },[user, allTasks])
 
   useEffect(() => {
     dispatch(fetchTasks());

@@ -1,6 +1,7 @@
 const initialState = {
   loading: false,
   isAuthenticated: false,
+  status: null,
   token: null,
   role: null,
   error: null,
@@ -13,7 +14,8 @@ export const LoginReducer = (state = initialState, action) => {
         ...state,
         loading: true,
         error: null,
-        status: 'request'
+        status: 'request',
+        isAuthenticated: false,
       };
     case 'LOGIN_SUCCESS':
       return {

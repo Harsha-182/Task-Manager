@@ -54,7 +54,7 @@ router.post('/login',
     
       const token = await user.getJwtToken();
         
-      await userController.addSessionHistory({userId:checkUser.id, token })
+      // await userController.addSessionHistory({userId:checkUser.id, token })
 
       return res.status(200).json(successResponseGenerator({
         accessToken: token,
