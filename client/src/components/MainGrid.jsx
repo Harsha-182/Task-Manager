@@ -44,10 +44,10 @@ const AdminDashboard = () => {
     },[tasks, user])
 
   return (
-    <Box sx={{ padding: 4 }}>
+    <Box sx={{ padding: 4 }} style={{backgroundColor: ''}}>
       <Typography variant="h5" component="h1" gutterBottom>
             Welcome
-            <span style={{ fontWeight: 'bold', color: '#e87716', marginLeft: '8px' }}>{(user?.userList?.name).toUpperCase()}</span>!
+            <span style={{ fontWeight: 'bold', color: '#e87716', marginLeft: '8px' }}>{(user?.userList?.name)?.toUpperCase() || ''}</span>!
       </Typography>
 
       <TableContainer component={Paper} sx={{ marginTop: 4 }}>

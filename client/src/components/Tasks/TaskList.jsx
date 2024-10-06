@@ -14,6 +14,7 @@ import { fetchUser, fetchUserFromDB } from '../actions/UserAction';
 
 const TaskList = () => {
   const dispatch = useDispatch();
+
   const allTasks = useSelector((state) => state.Task.tasks);
   const user = useSelector((state) => state.User);
   const userStatus = useSelector((state) => state.GetUsers);
@@ -39,7 +40,7 @@ const TaskList = () => {
     dispatch(fetchTasks());
     dispatch(fetchUser());
     dispatch(fetchUserFromDB());
-  }, [dispatch]);
+  }, []);
 
   useEffect(() => {
     if (userStatus && userStatus.status === 'success') {
@@ -125,6 +126,16 @@ const TaskList = () => {
     dispatch(updateTask(taskToUpdate, index));
   }
 
+  const MenuProps = {
+    PaperProps: {
+      style: {
+        maxHeight: 200, 
+        overflowY: 'auto',
+      },
+    },
+  };
+
+
   return (
     <Box sx={{ padding: 2 }}>
       <Typography variant="h4" component="h2" gutterBottom>
@@ -200,22 +211,29 @@ const TaskList = () => {
                                 <TableCell sx={{ fontWeight: 'bold' }}>{task.createdOn}</TableCell>
                                 <TableCell sx={{ fontWeight: 'bold' }}>
                                   <FormControl>
-                                    <Select
-                                      value={task.assignTo || 'Assign To'}
-                                      onChange={(e) => handleAssignTo(e, index)}
-                                      displayEmpty
-                                      style={{width:'120px', height: '50px'}}
-                                      disabled={user?.userList?.role === 'user'}
-                                    >
-                                      <MenuItem value="">
-                                        <em>Assign to user</em>
-                                      </MenuItem>
-                                      {userList.map((user) => (
-                                        <MenuItem key={user.id} value={user.id}>
-                                          {user.first_name} {user.last_name}
-                                        </MenuItem>
-                                      ))}
-                                    </Select>
+                                    {
+                                      userList.length > 0 ? (
+                                        <Select
+                                          value={task.assignTo || ""}
+                                          onChange={(e) => handleAssignTo(e, index)}
+                                          displayEmpty
+                                          style={{width:'120px', height: '50px'}}
+                                          disabled={user?.userList?.role === 'user'}
+                                          MenuProps={MenuProps}
+                                        >
+                                          <MenuItem value="">
+                                            <em>Assign to user</em>
+                                          </MenuItem>
+                                          {userList.map((user) => (
+                                            <MenuItem key={user.id} value={user.id}>
+                                              {user.first_name} {user.last_name}
+                                            </MenuItem>
+                                          ))}
+                                        </Select>
+                                      ) : (
+                                        <p>Loading...</p>
+                                      )
+                                    }
                                   </FormControl>
                                 </TableCell>
                                 <TableCell>

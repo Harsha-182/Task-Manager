@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { TextField, Button, Checkbox, FormControlLabel, Alert, MenuItem, Select, Box } from '@mui/material';
 
-const ProjectForm = () => {
+import { TextField, Button, Checkbox, FormControlLabel, 
+    Alert, MenuItem, Select, Box, Typography } from '@mui/material';
+
+const AddProject = () => {
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const [alert, setAlert] = useState({ show: false, type: '', message: '' });
   const [formValues, setFormValues] = useState({
@@ -12,13 +14,15 @@ const ProjectForm = () => {
     description: '',
     allowTeamAccess: false,
   });
+  
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
-    if(alert.show){
-        setShowSuccessAlert(true);
-        setTimeout(() => setShowSuccessAlert(false), 3000);
+    if (alert.show) {
+      setShowSuccessAlert(true);
+      setTimeout(() => setShowSuccessAlert(false), 3000);
     }
-  },[alert.show])
+  }, [alert.show]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -28,15 +32,43 @@ const ProjectForm = () => {
     });
   };
 
+  const validateForm = () => {
+    const newErrors = {};
+    
+    if (!formValues.projectName) {
+      newErrors.projectName = 'Project name is required.';
+    }
+    
+    if (!formValues.status) {
+      newErrors.status = 'Status is required.';
+    }
+    
+    if (!formValues.startDate) {
+      newErrors.startDate = 'Start date is required.';
+    }
+    
+    if (!formValues.endDate) {
+      newErrors.endDate = 'End date is required.';
+    }
+    
+    if (!formValues.description) {
+      newErrors.description = 'Description is required.';
+    }
+
+    return newErrors;
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    const { projectName, status, startDate, endDate, description } = formValues;
+    const formErrors = validateForm();
 
-    if (!projectName || !status || !startDate || !endDate || !description) {
-      setAlert({ show: true, type: 'error', message: 'All fields are required!' });
+    if (Object.keys(formErrors).length > 0) {
+      setErrors(formErrors);
       return;
     }
+    
+    setErrors({});
 
     const newProject = {
       id: Date.now(),
@@ -68,6 +100,7 @@ const ProjectForm = () => {
       description: '',
       allowTeamAccess: false,
     });
+    setErrors({});
   };
 
   return (
@@ -84,23 +117,22 @@ const ProjectForm = () => {
           label="Project Name"
           name="projectName"
           value={formValues.projectName}
-          style={{marginBottom:'20px'}}
+          style={{ marginBottom: '20px' }}
           onChange={handleChange}
           fullWidth
           margin="normal"
-          required
         />
-        
+        {errors.projectName && <Typography color="red" variant="caption">{errors.projectName}</Typography>}
+
         <Select
           label="Status"
           name="status"
           value={formValues.status}
-          style={{marginBottom:'20px'}}
+          style={{ marginBottom: '20px' }}
           onChange={handleChange}
           fullWidth
           margin="normal"
           displayEmpty
-          required
         >
           <MenuItem value="">
             <em>Select Status</em>
@@ -109,43 +141,47 @@ const ProjectForm = () => {
           <MenuItem value="In Progress">In Progress</MenuItem>
           <MenuItem value="Completed">Completed</MenuItem>
         </Select>
+        {errors.status && <Typography color="red" variant="caption">{errors.status}</Typography>}
 
         <TextField
           label="Start Date"
           type="date"
           name="startDate"
           value={formValues.startDate}
-          style={{marginBottom:'20px'}}
+          style={{ marginBottom: '20px' }}
           onChange={handleChange}
           InputLabelProps={{ shrink: true }}
           fullWidth
           margin="normal"
-          required
         />
+        {errors.startDate && <Typography color="red" variant="caption">{errors.startDate}</Typography>}
+
         <TextField
           label="End Date"
           type="date"
           name="endDate"
           value={formValues.endDate}
-          style={{marginBottom:'20px'}}
+          style={{ marginBottom: '20px' }}
           onChange={handleChange}
           InputLabelProps={{ shrink: true }}
           fullWidth
           margin="normal"
-          required
         />
+        {errors.endDate && <Typography color="red" variant="caption">{errors.endDate}</Typography>}
+
         <TextField
           label="Description"
           name="description"
           value={formValues.description}
           onChange={handleChange}
-          style={{marginBottom:'20px'}}
+          style={{ marginBottom: '20px' }}
           multiline
           rows={4}
           fullWidth
           margin="normal"
-          required
         />
+        {errors.description && <Typography color="red" variant="caption">{errors.description}</Typography>}
+
         <FormControlLabel
           control={
             <Checkbox
@@ -157,6 +193,7 @@ const ProjectForm = () => {
           }
           label="Allow all team members to access this project"
         />
+        
         <Box sx={{ display: 'flex', justifyContent: 'space-between', marginTop: 2 }}>
           <Button variant="contained" color="primary" type="submit">
             Save
@@ -170,4 +207,4 @@ const ProjectForm = () => {
   );
 };
 
-export default ProjectForm;
+export default AddProject;

@@ -1,10 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+
 import { Box, Button, TextField, MenuItem, Typography, Grid, Alert } from '@mui/material';
+
 import { signup } from '../actions/AuthAction/signup';
 
-const AddUserForm = () => {
+const AddUser = () => {
     const dispatch = useDispatch();
+    const { error, success, status } = useSelector((state) => state.Signup);
+
+    const [showErrorAlert, setShowErrorAlert] = useState(false);
+    const [showSuccessAlert, setShowSuccessAlert] = useState(false);
     const [formData, setFormData] = useState({
         first_name: '',
         last_name: '',
@@ -13,10 +19,7 @@ const AddUserForm = () => {
         password: '',
         confirmPassword: ''
     });
-    const { error, success, status } = useSelector((state) => state.Signup);
-    
-    const [showErrorAlert, setShowErrorAlert] = useState(false);
-    const [showSuccessAlert, setShowSuccessAlert] = useState(false);
+    const [errors, setErrors] = useState({});
 
     const resetFormFields = () => {
         setFormData({
@@ -27,6 +30,7 @@ const AddUserForm = () => {
             password: '',
             confirmPassword: ''
         });
+        setErrors({});
     };
 
     useEffect(() => {
@@ -54,26 +58,58 @@ const AddUserForm = () => {
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
+        setErrors((prevErrors) => ({ ...prevErrors, [name]: '' }));
+    };
+
+    const validateForm = () => {
+        const newErrors = {};
+
+        if (!formData.first_name) {
+            newErrors.first_name = 'First name is required.';
+        }
+        
+        if (!formData.last_name) {
+            newErrors.last_name = 'Last name is required.';
+        }
+
+        if (!formData.role) {
+            newErrors.role = 'Role is required.';
+        }
+
+        if (!formData.email) {
+            newErrors.email = 'Email is required.';
+        } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+            newErrors.email = 'Email is invalid.';
+        }
+
+        if (!formData.password) {
+            newErrors.password = 'Password is required.';
+        }
+
+        if (!formData.confirmPassword) {
+            newErrors.confirmPassword = 'Confirm Password is required.';
+        } else if (formData.password !== formData.confirmPassword) {
+            newErrors.confirmPassword = 'Passwords do not match.';
+        }
+
+        return newErrors;
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        if (formData.password !== formData.confirmPassword) {
-            alert("Passwords do not match");
+
+        const formErrors = validateForm();
+
+        if (Object.keys(formErrors).length > 0) {
+            setErrors(formErrors);
             return;
         }
+
         dispatch(signup(formData));
     };
 
     const handleCancel = () => {
-        setFormData({
-            first_name: '',
-            last_name: '',
-            role: '',
-            email: '',
-            password: '',
-            confirmPassword: ''
-        });
+        resetFormFields();
     };
 
     return (
@@ -90,7 +126,8 @@ const AddUserForm = () => {
                             value={formData.first_name}
                             onChange={handleChange}
                             fullWidth
-                            required
+                            error={!!errors.first_name}
+                            helperText={errors.first_name}
                         />
                     </Grid>
 
@@ -101,7 +138,8 @@ const AddUserForm = () => {
                             value={formData.last_name}
                             onChange={handleChange}
                             fullWidth
-                            required
+                            error={!!errors.last_name}
+                            helperText={errors.last_name}
                         />
                     </Grid>
 
@@ -113,7 +151,8 @@ const AddUserForm = () => {
                             value={formData.role}
                             onChange={handleChange}
                             fullWidth
-                            required
+                            error={!!errors.role}
+                            helperText={errors.role}
                         >
                             {roles.map((role) => (
                                 <MenuItem key={role} value={role}>
@@ -131,7 +170,8 @@ const AddUserForm = () => {
                             onChange={handleChange}
                             type="email"
                             fullWidth
-                            required
+                            error={!!errors.email}
+                            helperText={errors.email}
                         />
                     </Grid>
 
@@ -143,7 +183,8 @@ const AddUserForm = () => {
                             value={formData.password}
                             onChange={handleChange}
                             fullWidth
-                            required
+                            error={!!errors.password}
+                            helperText={errors.password}
                         />
                     </Grid>
 
@@ -155,7 +196,8 @@ const AddUserForm = () => {
                             value={formData.confirmPassword}
                             onChange={handleChange}
                             fullWidth
-                            required
+                            error={!!errors.confirmPassword}
+                            helperText={errors.confirmPassword}
                         />
                     </Grid>
                 </Grid>
@@ -175,4 +217,4 @@ const AddUserForm = () => {
     );
 };
 
-export default AddUserForm;
+export default AddUser;

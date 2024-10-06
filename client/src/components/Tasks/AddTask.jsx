@@ -2,8 +2,6 @@ import React, { useState, useEffect, useReducer } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import Box from '@mui/material/Box';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
@@ -67,45 +65,72 @@ const AddTask = () => {
 
   const [taskCreatedOn, setTaskCreatedOn] = useState('');
   const [projects, setProjects] = useState([]);
-
+  const [errors, setErrors] = useState({});
+  
   const [state, dispatcher] = useReducer(reducer, initialState);
 
   const user = useSelector((state) => state.User);
   const tasks = useSelector((state) => state.Task.tasks);
 
   useEffect(() => {
-    if(user.userList){
-        let storedProjects = localStorage.getItem('projects');
+    if (user.userList) {
+      let storedProjects = localStorage.getItem('projects');
 
-        if(user.userList.role === 'admin' && storedProjects){
-            setProjects(JSON.parse(storedProjects));
-        }
-        else if(user.userList.role === 'user'){
-            const userProjectIds = 
-                tasks
-                  .filter(task => task.assignTo && task.assignTo === user.userList.id)
-                  .map(task => task.projectId)
-                        
-            let userProjectList = JSON.parse(storedProjects).filter(project =>
-                [...new Set(userProjectIds)].includes(project.id)
-            );
-            setProjects(userProjectList);
-        }
+      if (user.userList.role === 'admin' && storedProjects) {
+        setProjects(JSON.parse(storedProjects));
+      } else if (user.userList.role === 'user') {
+        const userProjectIds =
+          tasks
+            .filter((task) => task.assignTo && task.assignTo === user.userList.id)
+            .map((task) => task.projectId);
+
+        let userProjectList = JSON.parse(storedProjects).filter((project) =>
+          [...new Set(userProjectIds)].includes(project.id)
+        );
+        setProjects(userProjectList);
+      }
     }
-},[tasks, user])  
+  }, [tasks, user]);
 
-useEffect(() => {
-  dispatch(fetchTasks());
-  dispatch(fetchUser());
-}, [dispatch]);
+  useEffect(() => {
+    dispatch(fetchTasks());
+    dispatch(fetchUser());
+  }, [dispatch]);
+
+  const validateForm = () => {
+    const newErrors = {};
+    
+    if (!state.projectName) {
+      newErrors.projectName = 'Project name is required.';
+    }
+    
+    if (!state.taskName) {
+      newErrors.taskName = 'Task name is required.';
+    }
+    
+    if (!state.description) {
+      newErrors.description = 'Description is required.';
+    }
+
+    return newErrors;
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("projects?.projectName,", projects)
+    
+    const formErrors = validateForm();
+
+    if (Object.keys(formErrors).length > 0) {
+      setErrors(formErrors);
+      return;
+    }
+    
+    setErrors({});
+
     const taskData = {
       id: '_' + Math.random().toString(36).substr(2, 9),
       projectId: state.projectId,
-      assignTo: user.userList.role === 'admin'? state.assignTo : user.userList?.id,
+      assignTo: user.userList.role === 'admin' ? state.assignTo : user.userList?.id,
       projectName: state.projectName,
       taskName: state.taskName,
       description: state.description,
@@ -130,111 +155,109 @@ useEffect(() => {
   return (
     <>
       {
-       (user?.userList?.role === 'user' && projects.length == 0) ?
-          "You cannot add a task as no projects have been assigned to you." 
-          :
-          <Box style={{ display: 'flex', flexDirection: 'column'}}
+        (user?.userList?.role === 'user' && projects.length === 0) ?
+          "You cannot add a task as no projects have been assigned to you." :
+          <Box style={{ display: 'flex', flexDirection: 'column' }}
             sx={{ maxWidth: 500, margin: 'auto', padding: 3 }}>
-          <h2>Add Task</h2>
-              <form className={classes.formContainer} onSubmit={handleSubmit}>
-                <Grid container spacing={2}>
-                  <Grid item xs={12}>
-                    <TextField
-                      select
-                      className={classes.inputField}
-                      id="project"
-                      label="Project"
-                      variant="outlined"
-                      fullWidth
-                      required
-                      value={state.projectName}
-                      onChange={(e) => {
-                        const selectedProject = projects.find(
-                          (project) => project.projectName === e.target.value
-                        );
-                        if (selectedProject) {
-                          dispatcher({
-                            type: 'SET_PROJECT',
-                            payload: {
-                              projectName: selectedProject.projectName,
-                              projectId: selectedProject.id,
-                            },
-                          });
-                        }
-                      }}
-                    >
-                      {projects.map((project) => (
-                        <MenuItem key={project.id} value={project.projectName}>
-                          {project.projectName}
-                        </MenuItem>
-                      ))}
-                    </TextField>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField
-                      className={classes.inputField}
-                      id="task"
-                      label="Task"
-                      variant="outlined"
-                      fullWidth
-                      required
-                      value={state.taskName}
-                      onChange={(e) => dispatcher({ type: 'SET_FIELD', field: 'taskName', value: e.target.value })}
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField
-                      className={classes.inputField}
-                      id="description"
-                      label="Description"
-                      variant="outlined"
-                      multiline
-                      rows={4}
-                      fullWidth
-                      required
-                      value={state.description}
-                      onChange={(e) => dispatcher({ type: 'SET_FIELD', field: 'description', value: e.target.value })}
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Select
-                      className={classes.inputField}
-                      id="status"
-                      value={state.status}
-                      onChange={(e) => dispatcher({ type: 'SET_FIELD', field: 'status', value: e.target.value })}
-                    >
-                      <MenuItem value="Pending">Pending</MenuItem>
-                      <MenuItem value="In Progress">In Progress</MenuItem>
-                      <MenuItem value="Not Started">Not Started</MenuItem>
-                      <MenuItem value="Completed">Completed</MenuItem>
-                    </Select>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField
-                      style={{ marginBottom: '20px' }}
-                      className={classes.inputField}
-                      id="taskCreatedOn"
-                      label="Task Created On"
-                      variant="outlined"
-                      value={taskCreatedOn}
-                      InputLabelProps={{ shrink: true }}
-                      fullWidth
-                      required
-                      disabled
-                      onChange={(e) => setTaskCreatedOn(e.target.value)}
-                    />
-                  </Grid>
+            <h2>Add Task</h2>
+            <form className={classes.formContainer} onSubmit={handleSubmit}>
+              <Grid container spacing={2}>
+                <Grid item xs={12}>
+                  <TextField
+                    select
+                    className={classes.inputField}
+                    id="project"
+                    label="Project"
+                    variant="outlined"
+                    fullWidth
+                    value={state.projectName}
+                    onChange={(e) => {
+                      const selectedProject = projects.find(
+                        (project) => project.projectName === e.target.value
+                      );
+                      if (selectedProject) {
+                        dispatcher({
+                          type: 'SET_PROJECT',
+                          payload: {
+                            projectName: selectedProject.projectName,
+                            projectId: selectedProject.id,
+                          },
+                        });
+                      }
+                    }}
+                  >
+                    {projects.map((project) => (
+                      <MenuItem key={project.id} value={project.projectName}>
+                        {project.projectName}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                  {errors.projectName && <Typography color="red" variant="caption">{errors.projectName}</Typography>}
                 </Grid>
-                <Button
-                  className={classes.submitButton}
-                  variant="contained"
-                  color="primary"
-                  type="submit"
-                >
-                  Submit
-                </Button>
-              </form>
-        </Box>
+                <Grid item xs={12}>
+                  <TextField
+                    className={classes.inputField}
+                    id="task"
+                    label="Task"
+                    variant="outlined"
+                    fullWidth
+                    value={state.taskName}
+                    onChange={(e) => dispatcher({ type: 'SET_FIELD', field: 'taskName', value: e.target.value })}
+                  />
+                  {errors.taskName && <Typography color="red" variant="caption">{errors.taskName}</Typography>}
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    className={classes.inputField}
+                    id="description"
+                    label="Description"
+                    variant="outlined"
+                    multiline
+                    rows={4}
+                    fullWidth
+                    value={state.description}
+                    onChange={(e) => dispatcher({ type: 'SET_FIELD', field: 'description', value: e.target.value })}
+                  />
+                  {errors.description && <Typography color="red" variant="caption">{errors.description}</Typography>}
+                </Grid>
+                <Grid item xs={12}>
+                  <Select
+                    className={classes.inputField}
+                    id="status"
+                    value={state.status}
+                    onChange={(e) => dispatcher({ type: 'SET_FIELD', field: 'status', value: e.target.value })}
+                  >
+                    <MenuItem value="Pending">Pending</MenuItem>
+                    <MenuItem value="In Progress">In Progress</MenuItem>
+                    <MenuItem value="Not Started">Not Started</MenuItem>
+                    <MenuItem value="Completed">Completed</MenuItem>
+                  </Select>
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    style={{ marginBottom: '20px' }}
+                    className={classes.inputField}
+                    id="taskCreatedOn"
+                    label="Task Created On"
+                    variant="outlined"
+                    value={taskCreatedOn}
+                    InputLabelProps={{ shrink: true }}
+                    fullWidth
+                    disabled
+                    onChange={(e) => setTaskCreatedOn(e.target.value)}
+                  />
+                </Grid>
+              </Grid>
+              <Button
+                className={classes.submitButton}
+                variant="contained"
+                color="primary"
+                type="submit"
+              >
+                Submit
+              </Button>
+            </form>
+          </Box>
       }
     </>
   );

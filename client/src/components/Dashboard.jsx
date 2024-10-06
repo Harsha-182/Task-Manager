@@ -9,7 +9,7 @@ import MainGrid from './MainGrid';
 import AddUser from './Users/AddUser';
 import AddProject from './Projects/AddProject';
 
-function Dashboard(props) {
+const Dashboard = () => {
     const navigate = useNavigate();
     const userRole = localStorage.getItem('userRole');
     const requestedUrl = window.location.pathname;
@@ -65,7 +65,7 @@ function Dashboard(props) {
                         items = {sideNavItems}
                         role={userRole}/>}
                     >
-                    <Route path="/" Component={MainGrid} />
+                    <Route exact path="/" Component={MainGrid} />
                     <Route path="/addtask" Component={AddTask}/>
                     <Route path="/viewtask" Component={TaskList}/>
                     <Route path="/admin/adduser" Component={AddUser}/>

@@ -14,7 +14,7 @@ const useStyles = makeStyles((theme) => ({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.4)',
-    backdropFilter: 'blur(8px)', // Adjust the blur intensity as needed
+    backdropFilter: 'blur(8px)',
   },
   modalContentStyle: {
     backgroundColor: '#fff',
