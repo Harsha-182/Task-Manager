@@ -1,6 +1,8 @@
 Clone the application from `https://github.com/Harsha-182/Task-Manager.git`.
 
-# Task Manager ReactJS - Setup Project
+# Task Manager 
+
+# ReactJS - Setup Project
 
 ### Change Directory
 `cd client`
@@ -19,7 +21,7 @@ Code is now running on port 3000.
 * Download the `Postgres server and Pgadmin`.
 * Create the Database called `Task-Manager`.
 
-# SCN NodeJS  - Setup Project
+# NodeJS  - Setup Project
 
 ### Required softwares to run backend server
 * Install NodeJs , download from url: `https://nodejs.org/download/release/v20.14.0/`(Download .msi file).
