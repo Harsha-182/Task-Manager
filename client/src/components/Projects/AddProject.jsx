@@ -84,6 +84,7 @@ const ProjectForm = () => {
           label="Project Name"
           name="projectName"
           value={formValues.projectName}
+          style={{marginBottom:'20px'}}
           onChange={handleChange}
           fullWidth
           margin="normal"
@@ -94,6 +95,7 @@ const ProjectForm = () => {
           label="Status"
           name="status"
           value={formValues.status}
+          style={{marginBottom:'20px'}}
           onChange={handleChange}
           fullWidth
           margin="normal"
@@ -113,6 +115,7 @@ const ProjectForm = () => {
           type="date"
           name="startDate"
           value={formValues.startDate}
+          style={{marginBottom:'20px'}}
           onChange={handleChange}
           InputLabelProps={{ shrink: true }}
           fullWidth
@@ -124,6 +127,7 @@ const ProjectForm = () => {
           type="date"
           name="endDate"
           value={formValues.endDate}
+          style={{marginBottom:'20px'}}
           onChange={handleChange}
           InputLabelProps={{ shrink: true }}
           fullWidth
@@ -135,6 +139,7 @@ const ProjectForm = () => {
           name="description"
           value={formValues.description}
           onChange={handleChange}
+          style={{marginBottom:'20px'}}
           multiline
           rows={4}
           fullWidth

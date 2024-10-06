@@ -40,13 +40,10 @@ const Login = () => {
     if(isToast){
       console.log("status", status)
       if(status && status === 'success'){
-        console.log("role", role)
-        if(role === 'admin'){
+        if(role === 'admin' || role === 'user'){
           navigate('/dashboard/');
         } 
-        else if(role === 'user'){
-          navigate('/dashboard/user/');
-        } else {
+        else {
           toast.success('Your role not exist')
         }
         // toast.success('Login Successfull!')

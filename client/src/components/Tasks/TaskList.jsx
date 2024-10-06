@@ -33,7 +33,7 @@ const TaskList = () => {
           allTasks.filter(task => task.assignTo && task.assignTo === user.userList.id);
         setTasks(data)
       }
-  },[user, allTasks])
+  },[allTasks, user])
 
   useEffect(() => {
     dispatch(fetchTasks());
@@ -150,9 +150,9 @@ const TaskList = () => {
                     <TableHead>
                       <TableRow sx={{ backgroundColor: '#1976d2'}}>
                         <TableCell sx={{ fontWeight: 'bold' }}>Completed</TableCell>
-                        <TableCell sx={{ fontWeight: 'bold' }}>Company</TableCell>
                         <TableCell sx={{ fontWeight: 'bold' }}>Project</TableCell>
                         <TableCell sx={{ fontWeight: 'bold' }}>Task</TableCell>
+                        <TableCell sx={{ fontWeight: 'bold' }}>Description</TableCell>
                         <TableCell sx={{ fontWeight: 'bold' }}>Status</TableCell>
                         <TableCell sx={{ fontWeight: 'bold' }}>Task Created On</TableCell>
                         <TableCell sx={{ fontWeight: 'bold' }}>Assigned To</TableCell>
@@ -178,9 +178,9 @@ const TaskList = () => {
                                     onChange={() => handleMarkCompleted(task, index)}
                                   />
                                 </TableCell>
-                                <TableCell sx={{ fontWeight: 'bold' }}>{task.companyName}</TableCell>
                                 <TableCell sx={{ fontWeight: 'bold' }}>{task.projectName}</TableCell>
                                 <TableCell sx={{ fontWeight: 'bold' }}>{task.taskName}</TableCell>
+                                <TableCell sx={{ fontWeight: 'bold' }}>{task.description}</TableCell>
                                 <TableCell sx={{ fontWeight: 'bold' }}>
                                   <Grid container direction="column" alignItems="center">
                                     <Typography variant="body2">{task.status}</Typography>
@@ -205,6 +205,7 @@ const TaskList = () => {
                                       onChange={(e) => handleAssignTo(e, index)}
                                       displayEmpty
                                       style={{width:'120px', height: '50px'}}
+                                      disabled={user?.userList?.role === 'user'}
                                     >
                                       <MenuItem value="">
                                         <em>Assign to user</em>
@@ -260,20 +261,13 @@ const TaskList = () => {
         <DialogTitle>Update Task</DialogTitle>
         <DialogContent>
           <TextField
-            label="Company"
-            name="companyName"
-            value={updatedTask.companyName || ''}
-            onChange={handleInputChange}
-            fullWidth
-            margin="dense"
-          />
-          <TextField
             label="Project"
             name="projectName"
             value={updatedTask.projectName || ''}
             onChange={handleInputChange}
             fullWidth
             margin="dense"
+            disabled={user?.userList?.role === 'user'}
           />
           <TextField
             label="Task"
@@ -282,6 +276,18 @@ const TaskList = () => {
             onChange={handleInputChange}
             fullWidth
             margin="dense"
+            disabled={user?.userList?.role === 'user'}
+          />
+          <TextField
+            label="Desription"
+            name="description"
+            value={updatedTask.description || ''}
+            onChange={handleInputChange}
+            multiline
+            rows={4}
+            fullWidth
+            margin="dense"
+            disabled={user?.userList?.role === 'user'}
           />
           <Select
             label="Status"

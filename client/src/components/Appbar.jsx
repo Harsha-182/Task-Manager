@@ -22,23 +22,14 @@ function Appbar(props) {
   const { items, role } = props;
   const navigate = useNavigate();
 
-  const routeChoice = (text, role) => {
+  const routeChoice = (text) => {
     return (
-      role === 'admin' ?
-      text === 'Dashboard' ? 
+      text === 'Dashboard' ?
         '/dashboard/' :
         text === 'Users'?
           '/dashboard/admin/adduser':
           text === 'Project'?
             '/dashboard/admin/addproject':
-            `/dashboard/${text.replace(' ', '').toLowerCase()}`
-    :
-      text === 'Dashboard' ?
-        '/dashboard/user/' : 
-        text === 'Add Task'?
-          '/dashboard/user/adduser':
-          text === 'View Task'?
-            '/dashboard/user/viewtask':
             `/dashboard/${text.replace(' ', '').toLowerCase()}`
     )
   }
@@ -58,7 +49,11 @@ function Appbar(props) {
           <Typography variant="h6" noWrap component="div">
             Task Manager
           </Typography>
-          <Box sx={{ flexGrow: 1 }} />
+          <Box sx={{ flexGrow: 1, textAlign: 'center' }}>
+            <Typography variant="h6" noWrap component="div">
+              {role.toUpperCase()}
+            </Typography>
+          </Box>
           <Button color="inherit" onClick={handleLogout}>
             Logout
           </Button>
